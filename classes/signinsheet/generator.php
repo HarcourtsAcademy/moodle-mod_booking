@@ -56,6 +56,13 @@ class generator {
     public $teachers = array();
 
     /**
+     * add teachers?
+     *
+     * @var boolean
+     */
+    public $addteachers = false;
+
+    /**
      * times for event
      *
      * @var string
@@ -171,6 +178,7 @@ class generator {
             $this->colwidth = 297;
         }
         $this->orderby = $pdfoptions->orderby;
+        $this->bookingdata->get_teachers();
         if (!empty($this->bookingdata->option->teachers)) {
             foreach ($this->bookingdata->option->teachers as $value) {
                 $this->teachers[] = "{$value->firstname} {$value->lastname}";
@@ -259,6 +267,22 @@ class generator {
             }
         }
 
+        if (!$this->addteachers) {
+            $teachers = $DB->get_records_sql(
+                    'SELECT u.id, ' . get_all_user_name_fields(true, 'u') . $userfields .
+                    '
+            FROM {booking_teachers} bt
+            LEFT JOIN {user} u ON u.id = bt.userid
+            WHERE bt.optionid = :optionid ' .
+                    $addsqlwhere . "ORDER BY u.{$this->orderby} ASC",
+                    array_merge($groupparams,
+                            array('optionid' => $this->bookingdata->option->id)));
+            foreach ($teachers as $teacher) {
+                $teacher->isteacher = true;
+                array_push($users, $teacher);
+            }
+        }
+
         $this->pdf->SetCreator(PDF_CREATOR);
         $this->pdf->setPrintHeader(true);
         $this->pdf->setPrintFooter(true);
@@ -304,7 +328,11 @@ class generator {
                 unset($profilefieldnames[$key]);
             }
         }
+        $processteachers = false;
         foreach ($users as $user) {
+            if (!isset($user->isteacher)) {
+                $user->isteacher = false;
+            }
             $profiletext = '';
             profile_load_custom_fields($user);
             $userprofile = $user->profile;
@@ -315,6 +343,17 @@ class generator {
                         $profiletext .= $value . " ";
                     }
                 }
+            }
+            // The first time a teacher is processed a new page should be made.
+            if ($processteachers != $user->isteacher){
+                $processteachers = true;
+                $this->pdf->AddPage();
+                if ($fileuse) {
+                    $this->pdf->SetXY(18, 18);
+                    $this->pdf->Image('@' . $this->signinsheetlogo, '', '', $this->w, $this->h, '',
+                            '', 'T', true, 150, 'R', false, false, 0, false, false, false);
+                }
+                $this->set_page_header();
             }
             if ($this->pdf->go_to_newline(12)) {
                 if ($fileuse) {
@@ -388,7 +427,6 @@ class generator {
                         1);
             }
         }
-
         $this->pdf->Output($this->bookingdata->option->text . '.pdf', 'D');
     }
 

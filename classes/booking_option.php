@@ -206,13 +206,18 @@ class booking_option extends booking {
         $this->option->pollurlteachers = $bu->get_body($params, 'pollurlteachers', $params, true);
     }
 
+    /**
+     * Get teachers from booking_teachers if not set
+     */
     public function get_teachers() {
         global $DB;
-        $this->option->teachers = $DB->get_records_sql(
-                'SELECT DISTINCT t.userid, u.firstname, u.lastname
+        if (empty($this->option->teachers)) {
+            $this->option->teachers = $DB->get_records_sql(
+                    'SELECT DISTINCT t.userid, u.firstname, u.lastname
                             FROM {booking_teachers} t
                        LEFT JOIN {user} u ON t.userid = u.id
                            WHERE t.optionid = ' . $this->optionid . '');
+        }
     }
 
     /**
@@ -308,6 +313,46 @@ class booking_option extends booking {
             $this->allusers = $DB->get_records_sql($sql, $params);
         }
         return $this->allusers;
+    }
+
+    /**
+     * Get all users on waitinglist as an array of objects
+     * booking_answer id as key, ->userid,
+     *
+     * @return array of userobjects $this->allusers key: booking_answers id
+     */
+    public function get_all_users_onwaitlist() {
+        if (empty($this->allusers)) {
+            $allusers = $this->get_all_users();
+        } else {
+            $allusers = $this->allusers;
+        }
+        foreach ($allusers as $baid => $user){
+            if ($user->waitinglist == 1) {
+                $waitlistusers[$baid] = $user;
+            }
+        }
+        return $waitlistusers;
+    }
+
+    /**
+     * Get all users booked users (not aon waitlist) as an array of objects
+     * booking_answer id as key, ->userid,
+     *
+     * @return array of userobjects $this->allusers key: booking_answers id
+     */
+    public function get_all_users_booked() {
+        if (empty($this->allusers)) {
+            $allusers = $this->get_all_users();
+        } else {
+            $allusers = $this->allusers;
+        }
+        foreach ($allusers as $baid => $user){
+            if ($user->waitinglist != 1) {
+                $waitlistusers[$baid] = $user;
+            }
+        }
+        return $bookedusers;
     }
 
     /**
