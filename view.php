@@ -331,7 +331,7 @@ if (!$current and $bookingopen and has_capability('mod/booking:choose', $context
 
         if (!empty($booking->settings->duration)) {
             echo html_writer::start_tag('div');
-            echo html_writer::tag('label', get_string('eventduration', 'booking') . ': ',
+            echo html_writer::tag('label', get_string('eventduration', 'booking') . ':&nbsp;', // Patch: HA#006 mod_booking appearance tweaks
                     array('class' => 'bold'));
             echo html_writer::tag('span', $booking->settings->duration);
             echo html_writer::end_tag('div');
@@ -339,7 +339,7 @@ if (!$current and $bookingopen and has_capability('mod/booking:choose', $context
 
         if (!empty($booking->settings->points) && ($booking->settings->points != 0)) {
             echo html_writer::start_tag('div');
-            echo html_writer::tag('label', get_string('eventpoints', 'booking') . ': ',
+            echo html_writer::tag('label', get_string('eventpoints', 'booking') . ':&nbsp;',  // Patch: HA#006 mod_booking appearance tweaks
                     array('class' => 'bold'));
             echo html_writer::tag('span', $booking->settings->points);
             echo html_writer::end_tag('div');
@@ -347,7 +347,7 @@ if (!$current and $bookingopen and has_capability('mod/booking:choose', $context
 
         if (!empty($booking->settings->organizatorname)) {
             echo html_writer::start_tag('div');
-            echo html_writer::tag('label', get_string('organizatorname', 'booking') . ': ',
+            echo html_writer::tag('label', get_string('organizatorname', 'booking') . ':&nbsp;',  // Patch: HA#006 mod_booking appearance tweaks
                     array('class' => 'bold'));
             echo html_writer::tag('span', $booking->settings->organizatorname);
             echo html_writer::end_tag('div');
@@ -360,7 +360,7 @@ if (!$current and $bookingopen and has_capability('mod/booking:choose', $context
 
         if (count($files) > 0) {
             echo html_writer::start_tag('div');
-            echo html_writer::tag('label', get_string("attachedfiles", "booking") . ': ',
+            echo html_writer::tag('label', get_string("attachedfiles", "booking") . ':&nbsp;',  // Patch: HA#006 mod_booking appearance tweaks
                     array('class' => 'bold'));
 
             foreach ($files as $file) {
@@ -393,7 +393,7 @@ if (!$current and $bookingopen and has_capability('mod/booking:choose', $context
                 }
 
                 echo html_writer::start_tag('div');
-                echo html_writer::tag('label', get_string('category', 'booking') . ': ',
+                echo html_writer::tag('label', get_string('category', 'booking') . ':&nbsp;', // Patch: HA#006 mod_booking appearance tweaks
                         array('class' => 'bold'));
                 echo html_writer::tag('span', implode(', ', $links));
                 echo html_writer::end_tag('div');
@@ -824,6 +824,8 @@ if (!$current and $bookingopen and has_capability('mod/booking:choose', $context
     echo $OUTPUT->error_text(get_string("norighttobook", "booking"));
     echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $course->id)));
 }
+/* START Patch:  HA#006 mod_booking appearance tweaks
 echo $OUTPUT->box('<a href="http://www.edulabs.org">' . get_string('createdby', 'booking') . "</a>",
         'box mdl-align');
+   END Patch:  HA#006 */
 echo $OUTPUT->footer();
