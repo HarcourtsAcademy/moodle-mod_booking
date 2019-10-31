@@ -608,7 +608,7 @@ if (!$tableallbookings->is_downloading()) {
              ($bookingdata->option->coursestarttime == 0 ? get_string('nodateset', 'booking') : userdate(
                     $bookingdata->option->coursestarttime, get_string('strftimedatetime')) . " - " .
              userdate($bookingdata->option->courseendtime, get_string('strftimedatetime'))) . " | " .
-             (empty($bookingdata->booking->settings->lblteachname) ? get_string('teachers', 'booking') . ': ' : $bookingdata->booking->settings->lblteachname) .
+             (empty($bookingdata->booking->settings->lblteachname) ? get_string('teachers', 'booking') . ': ' : $bookingdata->booking->settings->lblteachname . ': ') . // Patch: HA#006 mod_booking appearance tweaks
              implode(', ', $teachers) . " {$linkst}</p>";
 
     $links = array();
